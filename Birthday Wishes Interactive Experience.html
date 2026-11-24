@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Happy Birthday Bestie ✨</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #090507;
+      --gold: #f5b942;
+      --pink: #ec4899;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: radial-gradient(circle at 50% 35%, #26101b 0%, #13080d 55%, #070305 100%);
+      color: #fff;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    .font-serif-display {
+      font-family: 'Playfair Display', serif;
+    }
+
+    .font-script {
+      font-family: 'Dancing Script', cursive;
+    }
+
+    /* Ambient Bokeh & Celebration Canvases */
+    #bokeh-canvas, #fx-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    #bokeh-canvas { z-index: 0; }
+    #fx-canvas { z-index: 60; }
+
+    /* Glassmorphism Cards & Buttons */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 215, 165, 0.16);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .glass-pill {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 215, 170, 0.22);
+    }
+
+    .btn-pink {
+      background: linear-gradient(135deg, #f472b6 0%, #ec4899 50%, #be185d 100%);
+      box-shadow: 0 0 25px rgba(236, 72, 153, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+    }
+    .btn-pink:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 0 34px rgba(236, 72, 153, 0.68);
+    }
+    .btn-pink:active { transform: scale(0.96); }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+      box-shadow: 0 0 22px rgba(245, 158, 11, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.45);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+    }
+    .btn-gold:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 0 32px rgba(245, 158, 11, 0.65);
+    }
+
+    /* Stage Container & Transitions */
+    .stage-wrapper {
+      position: relative;
+      z-index: 10;
+      min-height: 100dvh;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4.5rem 1.25rem 2.5rem;
+    }
+
+    .stage-view {
+      display: none;
+      width: 100%;
+      max-width: 520px;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      animation: fadeSlideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    .stage-view.active { display: flex; }
+
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(20px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Candle Flame & Smoke */
+    .candle-flame {
+      transform-origin: center bottom;
+      animation: flicker 0.85s infinite alternate ease-in-out;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+    .candle-flame.blown { opacity: 0; transform: scale(0.1); }
+
+    @keyframes flicker {
+      0% { transform: scale(1) rotate(-2deg); opacity: 0.92; }
+      50% { transform: scale(1.08, 0.93) rotate(2deg); opacity: 1; }
+      100% { transform: scale(0.95, 1.07) rotate(-1deg); opacity: 0.9; }
+    }
+
+    .smoke-puff { opacity: 0; }
+    .smoke-puff.rise { animation: smokeUp 1.5s ease-out forwards; }
+
+    @keyframes smokeUp {
+      0% { opacity: 0.8; transform: translateY(0) scale(0.6); }
+      100% { opacity: 0; transform: translateY(-28px) scale(1.7); }
+    }
+
+    /* 3x3 Sliding Puzzle */
+    .puzzle-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      width: min(82vw, 300px);
+      height: min(82vw, 300px);
+      background: rgba(255, 255, 255, 0.06);
+      padding: 6px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 215, 165, 0.22);
+    }
+
+    .puzzle-tile {
+      width: 100%;
+      height: 100%;
+      border-radius: 10px;
+      background-size: 300% 300%;
+      cursor: pointer;
+      transition: transform 0.16s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
+    }
+    .puzzle-tile:hover { transform: scale(0.98); }
+
+    .puzzle-empty {
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 10px;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Metallic Scratch Card */
+    .scratch-box {
+      position: relative;
+      width: min(84vw, 310px);
+      height: min(84vw, 310px);
+      border-radius: 22px;
+      overflow: hidden;
+      border: 2px solid rgba(255, 215, 165, 0.3);
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.65);
+    }
+
+    #scratch-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+      cursor: crosshair;
+      z-index: 5;
+      transition: opacity 0.65s ease;
+    }
+
+    /* PIN Keypad */
+    .pin-btn {
+      width: 62px;
+      height: 62px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.14s ease;
+    }
+    .pin-btn:hover { background: rgba(255, 255, 255, 0.16); }
+    .pin-btn:active { background: rgba(236, 72, 153, 0.45); transform: scale(0.92); }
+
+    .shake { animation: shakeAnim 0.4s ease-in-out; }
+    @keyframes shakeAnim {
+      0%, 100% { transform: translateX(0); }
+      25%, 75% { transform: translateX(-8px); }
+      50% { transform: translateX(8px); }
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.03); }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 200, 150, 0.25); border-radius: 999px; }
+  </style>
+</head>
+<body>
+
+  <!-- Background Golden Bokeh & Foreground Confetti/Fireworks Canvases -->
+  <canvas id="bokeh-canvas"></canvas>
+  <canvas id="fx-canvas"></canvas>
+
+  <!-- Top Navigation Bar: Stage Dots + Prominent Upload Photo & Customize Button + Melody Toggle -->
+  <header class="fixed top-0 inset-x-0 z-40 px-3 sm:px-6 py-3 flex items-center justify-between pointer-events-none">
+    <!-- Stage Progress Indicator -->
+    <div id="stage-dots" class="glass-pill px-3 py-1.5 rounded-full hidden sm:flex items-center gap-1.5 pointer-events-auto"></div>
+    <div id="stage-label-mobile" class="glass-pill px-3 py-1.5 rounded-full text-[11px] font-semibold text-amber-200 sm:hidden pointer-events-auto">
+      1 / 9
+    </div>
+
+    <!-- Action Controls -->
+    <div class="flex items-center gap-2 pointer-events-auto">
+      <button id="open-customize-btn" class="btn-gold px-3.5 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-bold text-white flex items-center gap-1.5 cursor-pointer">
+        <span>📸</span>
+        <span>Upload Photo &amp; Customize</span>
+      </button>
+      <button id="music-toggle-btn" class="glass-pill w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-amber-100 hover:bg-white/15 transition cursor-pointer" title="Toggle Birthday Melody">
+        <span id="music-icon">🎵</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main 9-Stage Container -->
+  <main class="stage-wrapper">
+
+    <!-- STAGE 1: Welcome & Name/Nickname Reveal with Confetti Burst -->
+    <section id="stage-1" class="stage-view active">
+      <div class="inline-flex items-center gap-2 glass-pill px-4 py-1.5 rounded-full text-xs text-amber-200 mb-5">
+        <span>✨</span>
+        <span>A Special Birthday Surprise</span>
+        <span>✨</span>
+      </div>
+
+      <!-- Portrait Frame Preview -->
+      <div class="relative w-36 h-36 sm:w-44 sm:h-44 rounded-full p-1.5 bg-gradient-to-tr from-pink-500 via-amber-300 to-rose-500 shadow-[0_0_40px_rgba(236,72,153,0.45)] mb-6">
+        <img id="hero-avatar" src="" alt="Birthday Queen" class="w-full h-full object-cover rounded-full bg-black/40" />
+        <span class="absolute -bottom-1 -right-1 text-2xl sm:text-3xl drop-shadow">👑</span>
+      </div>
+
+      <h1 class="font-serif-display text-3xl sm:text-5xl font-bold text-amber-50 leading-tight mb-2">
+        Happy Birthday,<br />
+        <span id="hero-name" class="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-rose-300 to-amber-300">Bestie</span>! 💖
+      </h1>
+
+      <p class="text-xs sm:text-sm text-amber-100/75 max-w-sm mb-8 leading-relaxed">
+        Today is all about celebrating the incredible, radiant, and irreplaceable person you are.
+      </p>
+
+      <div class="flex flex-col sm:flex-row items-center gap-3">
+        <button id="start-journey-btn" class="btn-pink px-7 py-3.5 rounded-full text-sm sm:text-base font-bold text-white cursor-pointer flex items-center gap-2">
+          <span>Begin Your Surprise</span>
+          <span>🎉</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- STAGE 2: Live Age Counter (Years, Days, Hours, Minutes) -->
+    <section id="stage-2" class="stage-view">
+      <span class="text-3xl mb-2">⏳✨</span>
+      <h2 class="font-serif-display text-2xl sm:text-4xl font-bold text-amber-50 mb-1">
+        The World Has Been Brighter
+      </h2>
+      <p class="text-xs sm:text-sm text-amber-200/75 mb-7">
+        Every single second since you arrived on <span id="display-dob" class="text-pink-300 font-semibold"></span>
+      </p>
+
+      <div class="grid grid-cols-2 gap-3.5 sm:gap-4 w-full max-w-md mb-8">
+        <div class="glass-card rounded-2xl p-4 sm:p-5">
+          <div id="age-years" class="text-3xl sm:text-4xl font-extrabold text-white">19</div>
+          <div class="text-[11px] uppercase tracking-widest text-amber-200/75 mt-1">Years</div>
+        </div>
+        <div class="glass-card rounded-2xl p-4 sm:p-5">
+          <div id="age-days" class="text-3xl sm:text-4xl font-extrabold text-amber-300">7,232</div>
+          <div class="text-[11px] uppercase tracking-widest text-amber-200/75 mt-1">Days</div>
+        </div>
+        <div class="glass-card rounded-2xl p-4 sm:p-5">
+          <div id="age-hours" class="text-3xl sm:text-4xl font-extrabold text-pink-300">173,579</div>
+          <div class="text-[11px] uppercase tracking-widest text-amber-200/75 mt-1">Hours</div>
+        </div>
+        <div class="glass-card rounded-2xl p-4 sm:p-5">
+          <div id="age-minutes" class="text-3xl sm:text-4xl font-extrabold text-rose-300">10,414,751</div>
+          <div class="text-[11px] uppercase tracking-widest text-amber-200/75 mt-1">Minutes</div>
+        </div>
+      </div>
+
+      <button data-next="3" class="next-stage-btn btn-pink px-7 py-3 rounded-full text-sm font-bold text-white cursor-pointer">
+        Make a Birthday Wish 🎂
+      </button>
+    </section>
+
+    <!-- STAGE 3: Interactive Cake with Blow-Out Candles (Click/Tap or Mic) -->
+    <section id="stage-3" class="stage-view">
+      <h2 class="font-serif-display text-2xl sm:text-4xl font-bold text-amber-50 mb-1">
+        Make a Wish! 🕯️
+      </h2>
+      <p id="cake-subtitle" class="text-xs sm:text-sm text-amber-200/80 mb-5">
+        Tap the candles or use your mic to blow them out ✨
+      </p>
+
+      <!-- Tiered Birthday Cake SVG -->
+      <div id="cake-touch-area" class="relative w-52 h-52 mb-4 cursor-pointer flex items-center justify-center">
+        <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-[0_18px_30px_rgba(236,72,153,0.38)]">
+          <ellipse cx="100" cy="178" rx="84" ry="12" fill="rgba(255,255,255,0.22)" />
+          <!-- Bottom Tier -->
+          <rect x="34" y="128" width="132" height="46" rx="12" fill="#db2777" />
+          <path d="M34 138 Q50 152 66 138 T100 138 T134 138 T166 138 L166 128 L34 128 Z" fill="#fbcfe8" />
+          <!-- Top Tier -->
+          <rect x="52" y="88" width="96" height="40" rx="10" fill="#f472b6" />
+          <path d="M52 98 Q65 110 78 98 T102 98 T126 98 T148 98 L148 88 L52 88 Z" fill="#fff1f2" />
+          <!-- Candles -->
+          <rect x="74" y="58" width="7" height="30" rx="3" fill="#fde047" />
+          <rect x="96.5" y="54" width="7" height="34" rx="3" fill="#93c5fd" />
+          <rect x="119" y="58" width="7" height="30" rx="3" fill="#fda4af" />
+          <!-- Flames -->
+          <path class="candle-flame" d="M77.5 40 C72 48, 73 56, 77.5 56 C82 56, 83 48, 77.5 40 Z" fill="#fbbf24" />
+          <path class="candle-flame" d="M100 36 C94.5 44, 95.5 52, 100 52 C104.5 52, 105.5 44, 100 36 Z" fill="#fbbf24" />
+          <path class="candle-flame" d="M122.5 40 C117 48, 118 56, 122.5 56 C127 56, 128 48, 122.5 40 Z" fill="#fbbf24" />
+          <!-- Smoke -->
+          <circle class="smoke-puff" cx="77.5" cy="45" r="4" fill="#e5e7eb" />
+          <circle class="smoke-puff" cx="100" cy="41" r="4.5" fill="#e5e7eb" />
+          <circle class="smoke-puff" cx="122.5" cy="45" r="4" fill="#e5e7eb" />
+        </svg>
+      </div>
+
+      <div id="cake-controls" class="flex flex-wrap items-center justify-center gap-3 mb-4">
+        <button id="blow-btn" class="btn-pink px-6 py-2.5 rounded-full text-sm font-bold text-white cursor-pointer">
+          💨 Blow Out Candles
+        </button>
+        <button id="mic-blow-btn" class="glass-pill px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold text-amber-100 hover:bg-white/15 transition cursor-pointer">
+          🎤 Blow via Mic
+        </button>
+      </div>
+
+      <button id="after-cake-btn" data-next="4" class="next-stage-btn hidden btn-gold px-7 py-3 rounded-full text-sm font-bold text-white cursor-pointer">
+        See Cute Memories 📸
+      </button>
+    </section>
+
+    <!-- STAGE 4: 3-Card Cute Memories Photo Carousel with Captions -->
+    <section id="stage-4" class="stage-view">
+      <h2 class="font-serif-display text-2xl sm:text-4xl font-bold text-amber-50 mb-1">
+        Cute Memories 💕
+      </h2>
+      <p class="text-xs sm:text-sm text-amber-200/75 mb-5">
+        Snapshots of our favorite moments together
+      </p>
+
+      <div class="glass-card rounded-3xl p-4 w-full max-w-[340px] mb-6">
+        <div class="relative w-full aspect-square rounded-2xl overflow-hidden bg-black/40">
+          <img id="carousel-photo" src="" alt="Memory" class="w-full h-full object-cover transition-opacity duration-300" />
+          <button id="carousel-prev" class="absolute left-2.5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/55 hover:bg-black/80 text-white flex items-center justify-center text-lg cursor-pointer backdrop-blur-sm">
+            ‹
+          </button>
+          <button id="carousel-next" class="absolute right-2.5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/55 hover:bg-black/80 text-white flex items-center justify-center text-lg cursor-pointer backdrop-blur-sm">
+            ›
+          </button>
+        </div>
+
+        <p id="carousel-caption" class="text-xs sm:text-sm text-amber-100 font-medium mt-3.5 px-1">
+          Every laugh with you is a core memory ✨
+        </p>
+
+        <div id="carousel-indicators" class="flex items-center justify-center gap-2 mt-3"></div>
+      </div>
+
+      <button data-next="5" class="next-stage-btn btn-pink px-7 py-3 rounded-full text-sm font-bold text-white cursor-pointer">
+        Play Memory Puzzle 🧩
+      </button>
+    </section>
+
+    <!-- STAGE 5: Interactive 3x3 Sliding Photo Puzzle -->
+    <section id="stage-5" class="stage-view">
+      <h2 class="font-serif-display text-2xl sm:text-4xl font-bold text-amber-50 mb-1">
+        Memory Puzzle 🧩
+      </h2>
+      <p class="text-xs sm:text-sm text-amber-200/75 mb-4">
+        Slide the tiles to complete your photo ✨
+      </p>
+
+      <div class="flex items-center gap-4 mb-4">
+        <div class="glass-card px-4 py-2 rounded-xl text-center">
+          <div id="puzzle-moves" class="text-lg font-bold text-white">0</div>
+          <div class="text-[10px] uppercase tracking-wider text-amber-200/70">Moves</div>
+        </div>
+        <div class="glass-card p-1.5 rounded-xl flex flex-col items-center">
+          <img id="puzzle-preview" src="" alt="Preview" class="w-11 h-11 rounded-lg object-cover" />
+          <span class="text-[9px] uppercase tracking-wider text-amber-200/70 mt-0.5">Goal</span>
+        </div>
+      </div>
+
+      <div id="puzzle-grid" class="puzzle-grid mb-3"></div>
+      <div id="puzzle-msg" class="text-xs sm:text-sm font-semibold text-emerald-300 min-h-[20px] mb-3"></div>
+
+      <div class="flex items-center justify-center gap-3 mb-4">
+        <button id="puzzle-shuffle" class="glass-pill px-4 py-2 rounded-full text-xs font-medium text-amber-100 hover:bg-white/15 cursor-pointer">
+          🔄 Shuffle
+        </button>
+        <button id="puzzle-solve" class="glass-pill px-4 py-2 rounded-full text-xs font-medium text-pink-200 hover:bg-white/15 cursor-pointer">
+          🪄 Auto-Solve
+        </button>
+      </div>
+
+      <button id="after-puzzle-btn" data-next="6" class="next-stage-btn hidden btn-pink px-7 py-3 rounded-full text-sm font-bold text-white cursor-pointer">
+        Reveal Scratch Surprise ✨
+      </button>
+    </section>
+
+    <!-- STAGE 6: Metallic Scratch-Off Card -->
+    <section id="stage-6" class="stage-view">
+      <h2 class="font-serif-display text-2xl sm:text-4xl font-bold text-amber-50 mb-1">
+        Golden Scratch Card ✨
+      </h2>
+      <p class="text-xs sm:text-sm text-amber-200/75 mb-5">
+        Scratch off the foil to reveal a hidden photo &amp; wish
+      </p>
+
+      <div class="scratch-box mb-6">
+        <div class="relative w-full h-full">
+          <img id="scratch-photo" src="" alt="Hidden Surprise" class="w-full h-full object-cover" />
+          <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/65 to-transparent p-4 text-center">
+            <p class="text-base font-bold text-amber-200">You Are Pure Magic! 🌟</p>
+            <p class="text-xs text-white/90 mt-0.5">So lucky to call you my best friend 💖</p>
+          </div>
+        </div>
+        <canvas id="scratch-canvas"></canvas>
+      </div>
+
+      <button id="after-scratch-btn" data-next="7" class="next-stage-btn hidden btn-pink px-7 py-3 rounded-full text-sm font-bold text-white cursor-pointer">
+        Unlock Secret Letter 🔐
+      </button>
+    </section>
+
+    <!-- STAGE 7: 4-Digit Secret PIN Lock -->
+    <section id="stage-7" class="stage-view">
+      <div id="pin-card" class="glass-card rounded-3xl p-6 sm:p-8 w-full max-w-[330px] flex flex-col items-center">
+        <div id="pin-lock-icon" class="text-3xl mb-2">🔐</div>
+        <h2 class="font-serif-display text-xl sm:text-2xl font-bold text-amber-50">
+          Secret Birthday Vault
+        </h2>
+        <p id="pin-status-text" class="text-xs text-amber-200/75 mt-1">
+          Enter the 4-digit PIN to unlock your letter
+        </p>
+        <p id="pin-hint-label" class="text-[11px] text-pink-300/90 mt-1 mb-5">
+          Hint: PIN 1234
+        </p>
+
+        <!-- 4 PIN Dots -->
+        <div id="pin-dots" class="flex items-center gap-3.5 mb-6">
+          <span class="w-3.5 h-3.5 rounded-full border border-pink-300/60 transition-all"></span>
+          <span class="w-3.5 h-3.5 rounded-full border border-pink-300/60 transition-all"></span>
+          <span class="w-3.5 h-3.5 rounded-full border border-pink-300/60 transition-all"></span>
+          <span class="w-3.5 h-3.5 rounded-full border border-pink-300/60 transition-all"></span>
+        </div>
+
+        <!-- Numeric Keypad -->
+        <div class="grid grid-cols-3 gap-3.5">
+          <button class="pin-btn" data-num="1">1</button>
+          <button class="pin-btn" data-num="2">2</button>
+          <button class="pin-btn" data-num="3">3</button>
+          <button class="pin-btn" data-num="4">4</button>
+          <button class="pin-btn" data-num="5">5</button>
+          <button class="pin-btn" data-num="6">6</button>
+          <button class="pin-btn" data-num="7">7</button>
+          <button class="pin-btn" data-num="8">8</button>
+          <button class="pin-btn" data-num="9">9</button>
+          <div></div>
+          <button class="pin-btn" data-num="0">0</button>
+          <button class="pin-btn text-base" data-num="del">⌫</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STAGE 8: Handwritten-Style Heartfelt Birthday Letter -->
+    <section id="stage-8" class="stage-view">
+      <h2 class="font-serif-display text-2xl sm:text-4xl font-bold text-amber-50 mb-4">
+        A Letter From My Heart 💌
+      </h2>
+
+      <div class="glass-card rounded-3xl p-6 sm:p-8 w-full max-w-md text-left relative mb-6 border border-amber-200/25">
+        <div class="flex items-center justify-between text-xs text-amber-200/65 mb-4 pb-3 border-b border-white/10">
+          <span>For <strong id="letter-to-name" class="text-pink-300">Bestie</strong> ✨</span>
+          <span>With Love 💛</span>
+        </div>
+
+        <div id="letter-typewriter" class="font-script text-2xl sm:text-[26px] text-amber-50/95 leading-relaxed whitespace-pre-line min-h-[210px]"></div>
+      </div>
+
+      <button id="to-finale-btn" data-next="9" class="next-stage-btn hidden btn-gold px-7 py-3 rounded-full text-sm font-bold text-white cursor-pointer">
+        Grand Finale Fireworks 🎆
+      </button>
+    </section>
+
+    <!-- STAGE 9: Grand Finale Fireworks & Wishes Screen -->
+    <section id="stage-9" class="stage-view">
+      <div class="text-4xl sm:text-5xl mb-3 animate-bounce">🎆🥂🎂</div>
+      <h1 class="font-serif-display text-3xl sm:text-5xl font-bold text-amber-50 leading-tight mb-3">
+        Cheers to You,<br />
+        <span id="finale-name" class="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-pink-400 to-rose-300">Bestie</span>!
+      </h1>
+      <p class="text-xs sm:text-sm text-amber-100/80 max-w-sm mb-7 leading-relaxed">
+        May this new chapter bring endless laughter, bold adventures, and every dream your heart wishes for. Happy Birthday! 💖
+      </p>
+
+      <!-- Photo Collage Strip -->
+      <div class="grid grid-cols-3 gap-2.5 w-full max-w-sm mb-8">
+        <img id="finale-img-0" src="" alt="Memory 1" class="aspect-square w-full object-cover rounded-2xl border border-amber-200/30 shadow-lg" />
+        <img id="finale-img-1" src="" alt="Memory 2" class="aspect-square w-full object-cover rounded-2xl border border-pink-300/30 shadow-lg -translate-y-2" />
+        <img id="finale-img-2" src="" alt="Memory 3" class="aspect-square w-full object-cover rounded-2xl border border-amber-200/30 shadow-lg" />
+      </div>
+
+      <div class="flex flex-wrap items-center justify-center gap-3">
+        <button id="more-fireworks-btn" class="btn-pink px-6 py-3 rounded-full text-sm font-bold text-white cursor-pointer">
+          🎇 Launch More Fireworks
+        </button>
+        <button id="replay-all-btn" class="glass-pill px-5 py-3 rounded-full text-xs sm:text-sm font-semibold text-amber-100 hover:bg-white/15 cursor-pointer">
+          🔄 Replay Surprise
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================
+       UPLOAD PHOTO & CUSTOMIZE DRAWER / MODAL
+       ======================================================================== -->
+  <div id="customize-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-md p-3 sm:p-5">
+    <div class="glass-card rounded-3xl w-full max-w-lg max-h-[92dvh] overflow-y-auto p-5 sm:p-7 text-left relative border border-amber-300/30">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-serif-display text-xl sm:text-2xl font-bold text-amber-100">
+          📸 Upload Photo &amp; Customize
+        </h3>
+        <button id="close-customize-btn" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-sm cursor-pointer">
+          ✕
+        </button>
+      </div>
+
+      <p class="text-xs text-amber-200/75 mb-5">
+        Upload 1 to 3 photos of your best friend! They automatically update the Welcome Portrait, Memories Carousel, 3×3 Sliding Puzzle, Scratch Card, and Finale Collage.
+      </p>
+
+      <!-- 3 Photo Upload Slots -->
+      <div class="mb-5">
+        <label class="block text-xs font-bold uppercase tracking-wider text-amber-200/85 mb-2">
+          1. Upload Her Photos (Base64 Embedded)
+        </label>
+        <div class="grid grid-cols-3 gap-3">
+          <label class="cursor-pointer group flex flex-col items-center">
+            <div class="w-full aspect-square rounded-2xl overflow-hidden border-2 border-dashed border-pink-400/50 relative bg-white/5">
+              <img id="slot-preview-0" src="" alt="Photo 1" class="w-full h-full object-cover" />
+              <div class="absolute inset-0 bg-black/55 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-xs font-semibold text-white">
+                Upload #1
+              </div>
+            </div>
+            <span class="text-[11px] text-amber-200/80 mt-1.5 font-medium">Photo 1 (Main)</span>
+            <input type="file" accept="image/*" class="hidden photo-upload-input" data-slot="0" />
+          </label>
+
+          <label class="cursor-pointer group flex flex-col items-center">
+            <div class="w-full aspect-square rounded-2xl overflow-hidden border-2 border-dashed border-amber-300/45 relative bg-white/5">
+              <img id="slot-preview-1" src="" alt="Photo 2" class="w-full h-full object-cover" />
+              <div class="absolute inset-0 bg-black/55 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-xs font-semibold text-white">
+                Upload #2
+              </div>
+            </div>
+            <span class="text-[11px] text-amber-200/80 mt-1.5 font-medium">Photo 2</span>
+            <input type="file" accept="image/*" class="hidden photo-upload-input" data-slot="1" />
+          </label>
+
+          <label class="cursor-pointer group flex flex-col items-center">
+            <div class="w-full aspect-square rounded-2xl overflow-hidden border-2 border-dashed border-amber-300/45 relative bg-white/5">
+              <img id="slot-preview-2" src="" alt="Photo 3" class="w-full h-full object-cover" />
+              <div class="absolute inset-0 bg-black/55 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-xs font-semibold text-white">
+                Upload #3
+              </div>
+            </div>
+            <span class="text-[11px] text-amber-200/80 mt-1.5 font-medium">Photo 3</span>
+            <input type="file" accept="image/*" class="hidden photo-upload-input" data-slot="2" />
+          </label>
+        </div>
+      </div>
+
+      <!-- Nickname, Birth Date & 4-Digit PIN -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+        <div>
+          <label class="block text-[11px] font-semibold text-amber-200/80 mb-1">Her Nickname</label>
+          <input id="cfg-name" type="text" maxlength="22" class="w-full bg-white/10 border border-white/15 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-pink-400" />
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-amber-200/80 mb-1">Birth Date</label>
+          <input id="cfg-dob" type="date" class="w-full bg-white/10 border border-white/15 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-pink-400" />
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-amber-200/80 mb-1">4-Digit PIN</label>
+          <input id="cfg-pin" type="text" maxlength="4" pattern="\d{4}" class="w-full bg-white/10 border border-white/15 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-pink-400" />
+        </div>
+      </div>
+
+      <!-- Carousel Captions -->
+      <div class="mb-4">
+        <label class="block text-[11px] font-semibold text-amber-200/80 mb-1">Photo Captions (1 per line)</label>
+        <textarea id="cfg-captions" rows="2" class="w-full bg-white/10 border border-white/15 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-pink-400"></textarea>
+      </div>
+
+      <!-- Heartfelt Letter Text -->
+      <div class="mb-5">
+        <label class="block text-[11px] font-semibold text-amber-200/80 mb-1">Heartfelt Birthday Letter</label>
+        <textarea id="cfg-letter" rows="4" class="w-full bg-white/10 border border-white/15 rounded-xl p-3 text-xs sm:text-sm text-white focus:outline-none focus:border-pink-400 leading-relaxed"></textarea>
+      </div>
+
+      <!-- Save & Download Single HTML Buttons -->
+      <div class="flex flex-col sm:flex-row gap-2.5">
+        <button id="apply-cfg-btn" class="btn-pink flex-1 py-3 px-4 rounded-xl text-sm font-bold text-white cursor-pointer">
+          ✅ Save &amp; Preview Live
+        </button>
+        <button id="download-html-btn" class="btn-gold flex-1 py-3 px-4 rounded-xl text-sm font-bold text-white cursor-pointer">
+          ⬇️ Download index.html
+        </button>
+      </div>
+
+      <p id="modal-feedback" class="text-center text-xs text-emerald-300 mt-2.5 min-h-[18px]"></p>
+    </div>
+  </div>
+
+  <!-- Embedded JSON State (Overwritten automatically on Download index.html) -->
+  <script id="embedded-state" type="application/json">null</script>
+
+  <script>
+    /* ========================================================================
+       1. DEFAULT DATA & SELF-CONTAINED SVG PLACEHOLDER ILLUSTRATIONS
+       ======================================================================== */
+    const DEFAULT_PHOTOS = [
+      "data:image/svg+xml;utf8," + encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#3b0d26"/>
+              <stop offset="50%" stop-color="#9d174d"/>
+              <stop offset="100%" stop-color="#f59e0b"/>
+            </linearGradient>
+          </defs>
+          <rect width="600" height="600" fill="url(#g1)"/>
+          <circle cx="460" cy="140" r="100" fill="rgba(255,255,255,0.12)"/>
+          <text x="300" y="255" font-size="115" text-anchor="middle">👯‍♀️</text>
+          <text x="300" y="345" font-family="sans-serif" font-weight="bold" font-size="32" fill="#fff" text-anchor="middle">Bestie Memories #1</text>
+          <text x="300" y="390" font-family="sans-serif" font-size="19" fill="#fde68a" text-anchor="middle">Tap "Upload Photo" above 📸</text>
+        </svg>
+      `),
+      "data:image/svg+xml;utf8," + encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+          <defs>
+            <linearGradient id="g2" x1="0" y1="1" x2="1" y2="0">
+              <stop offset="0%" stop-color="#1e1b4b"/>
+              <stop offset="55%" stop-color="#86198f"/>
+              <stop offset="100%" stop-color="#ec4899"/>
+            </linearGradient>
+          </defs>
+          <rect width="600" height="600" fill="url(#g2)"/>
+          <text x="300" y="255" font-size="115" text-anchor="middle">✨🥂✨</text>
+          <text x="300" y="345" font-family="sans-serif" font-weight="bold" font-size="32" fill="#fff" text-anchor="middle">Unforgettable Laughs #2</text>
+          <text x="300" y="390" font-family="sans-serif" font-size="19" fill="#fbcfe8" text-anchor="middle">Upload Photo #2 in Customize</text>
+        </svg>
+      `),
+      "data:image/svg+xml;utf8," + encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+          <defs>
+            <linearGradient id="g3" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#451a03"/>
+              <stop offset="50%" stop-color="#9a3412"/>
+              <stop offset="100%" stop-color="#db2777"/>
+            </linearGradient>
+          </defs>
+          <rect width="600" height="600" fill="url(#g3)"/>
+          <text x="300" y="255" font-size="115" text-anchor="middle">🌸💛🌸</text>
+          <text x="300" y="345" font-family="sans-serif" font-weight="bold" font-size="32" fill="#fff" text-anchor="middle">Forever Grateful #3</text>
+          <text x="300" y="390" font-family="sans-serif" font-size="19" fill="#fde68a" text-anchor="middle">Upload Photo #3 in Customize</text>
+        </svg>
+      `)
+    ];
+
+    const DEFAULT_STATE = {
+      name: "Bestie",
+      dob: "2006-11-24",
+      pin: "1234",
+      photos: [...DEFAULT_PHOTOS],
+      captions: [
+        "Every laugh with you is a core memory ✨",
+        "Through every high & low, always by your side 💛",
+        "Here's to endless adventures together 🌟"
+      ],
+      letter: `My dearest Bestie,\n\nHappy Birthday! On your special day, I just want to remind you how deeply appreciated, loved, and irreplaceable you are to me.\n\nFrom our late-night talks to our endless inside jokes, you turn ordinary moments into my favorite memories. Your kindness, energy, and smile make the world so much brighter.\n\nThank you for always being my safe place and biggest cheerleader. May this year bring you everything your heart wishes for and more!\n\nAlways cheering you on, 💛`
+    };
+
+    let appState = (() => {
+      try {
+        const raw = document.getElementById("embedded-state").textContent.trim();
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === "object") {
+          return { ...DEFAULT_STATE, ...parsed };
+        }
+      } catch (e) {}
+      return JSON.parse(JSON.stringify(DEFAULT_STATE));
+    })();
+
+    /* ========================================================================
+       2. WEB AUDIO API SOFT BIRTHDAY MELODY & CHIME ENGINE
+       ======================================================================== */
+    let audioCtx = null;
+    let melodyPlaying = false;
+    let melodyTimeout = null;
+
+    // Gentle music-box "Happy Birthday" notes (Hz, duration in ms)
+    const BIRTHDAY_MELODY = [
+      [261.63, 320], [261.63, 180], [293.66, 500], [261.63, 500], [349.23, 500], [329.63, 900],
+      [261.63, 320], [261.63, 180], [293.66, 500], [261.63, 500], [392.00, 500], [349.23, 900],
+      [261.63, 320], [261.63, 180], [523.25, 500], [440.00, 500], [349.23, 500], [329.63, 500], [293.66, 900],
+      [466.16, 320], [466.16, 180], [440.00, 500], [349.23, 500], [392.00, 500], [349.23, 1100]
+    ];
+
+    function ensureAudioCtx() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === "suspended") audioCtx.resume();
+    }
+
+    function playSoftNote(freq, durMs, vol = 0.045, type = "sine") {
+      try {
+        ensureAudioCtx();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(vol, audioCtx.currentTime + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + durMs / 1000);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + durMs / 1000 + 0.02);
+      } catch (e) {}
+    }
+
+    function playChime() {
+      [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+        setTimeout(() => playSoftNote(f, 450, 0.06, "triangle"), i * 70);
+      });
+    }
+
+    function startBirthdayMelody() {
+      if (melodyPlaying) return;
+      melodyPlaying = true;
+      document.getElementById("music-icon").textContent = "🎶";
+      let noteIdx = 0;
+
+      function step() {
+        if (!melodyPlaying) return;
+        const [freq, dur] = BIRTHDAY_MELODY[noteIdx];
+        playSoftNote(freq, dur * 1.15, 0.04, "sine");
+        noteIdx = (noteIdx + 1) % BIRTHDAY_MELODY.length;
+        melodyTimeout = setTimeout(step, dur + (noteIdx === 0 ? 1200 : 40));
+      }
+      step();
+    }
+
+    function stopBirthdayMelody() {
+      melodyPlaying = false;
+      clearTimeout(melodyTimeout);
+      document.getElementById("music-icon").textContent = "🔇";
+    }
+
+    document.getElementById("music-toggle-btn").addEventListener("click", () => {
+      if (melodyPlaying) {
+        stopBirthdayMelody();
+      } else {
+        startBirthdayMelody();
+      }
+    });
+
+    /* ========================================================================
+       3. GOLDEN BOKEH PARTICLES & CONFETTI / FIREWORKS CANVAS ENGINE
+       ======================================================================== */
+    const bokehCanvas = document.getElementById("bokeh-canvas");
+    const bCtx = bokehCanvas.getContext("2d");
+    let bokehParticles = [];
+
+    function initBokeh() {
+      bokehCanvas.width = window.innerWidth;
+      bokehCanvas.height = window.innerHeight;
+      const count = Math.min(48, Math.max(24, Math.floor((window.innerWidth * window.innerHeight) / 22000)));
+      bokehParticles = Array.from({ length: count }, () => ({
+        x: Math.random() * bokehCanvas.width,
+        y: Math.random() * bokehCanvas.height,
+        r: Math.random() * 6 + 2.5,
+        vx: (Math.random() - 0.5) * 0.35,
+        vy: -Math.random() * 0.45 - 0.1,
+        alpha: Math.random() * 0.65 + 0.2,
+        phase: Math.random() * Math.PI * 2
+      }));
+    }
+
+    function renderBokeh() {
+      bCtx.clearRect(0, 0, bokehCanvas.width, bokehCanvas.height);
+      for (const p of bokehParticles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.phase += 0.025;
+        if (p.y < -20) p.y = bokehCanvas.height + 20;
+        if (p.x < -20) p.x = bokehCanvas.width + 20;
+        if (p.x > bokehCanvas.width + 20) p.x = -20;
+
+        const a = p.alpha * (0.65 + 0.35 * Math.sin(p.phase));
+        const g = bCtx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 2.5);
+        g.addColorStop(0, `rgba(255, 226, 138, ${a})`);
+        g.addColorStop(0.5, `rgba(245, 165, 55, ${a * 0.45})`);
+        g.addColorStop(1, "rgba(245, 158, 11, 0)");
+        bCtx.fillStyle = g;
+        bCtx.beginPath();
+        bCtx.arc(p.x, p.y, p.r * 2.5, 0, Math.PI * 2);
+        bCtx.fill();
+      }
+      requestAnimationFrame(renderBokeh);
+    }
+
+    window.addEventListener("resize", () => {
+      bokehCanvas.width = window.innerWidth;
+      bokehCanvas.height = window.innerHeight;
+    });
+    initBokeh();
+    renderBokeh();
+
+    // Foreground Confetti & Fireworks Engine
+    const fxCanvas = document.getElementById("fx-canvas");
+    const fCtx = fxCanvas.getContext("2d");
+    let fxParticles = [];
+    let fxAnimating = false;
+
+    function launchBurst(type = "confetti", originX = null, originY = null) {
+      fxCanvas.width = window.innerWidth;
+      fxCanvas.height = window.innerHeight;
+      const ox = originX ?? fxCanvas.width * 0.5;
+      const oy = originY ?? (type === "firework" ? fxCanvas.height * (0.25 + Math.random() * 0.3) : fxCanvas.height * 0.55);
+      const colors = ["#ec4899", "#fbbf24", "#f472b6", "#fde047", "#60a5fa", "#34d399", "#c084fc"];
+
+      const count = type === "firework" ? 80 : 100;
+      for (let i = 0; i < count; i++) {
+        const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.2;
+        const speed = type === "firework" ? (Math.random() * 6.5 + 2.5) : (Math.random() * 11 + 3);
+        fxParticles.push({
+          type,
+          x: ox,
+          y: oy,
+          vx: type === "firework" ? Math.cos(angle) * speed : (Math.random() - 0.5) * 14,
+          vy: type === "firework" ? Math.sin(angle) * speed : -Math.random() * 14 - 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          size: type === "firework" ? (Math.random() * 3.5 + 2) : (Math.random() * 7 + 4),
+          alpha: 1,
+          rot: Math.random() * 360,
+          vRot: (Math.random() - 0.5) * 12
+        });
+      }
+
+      if (!fxAnimating) {
+        fxAnimating = true;
+        animateFx();
+      }
+    }
+
+    function animateFx() {
+      fCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+      fxParticles.forEach((p) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.type === "firework") {
+          p.vx *= 0.96;
+          p.vy = p.vy * 0.96 + 0.08;
+          p.alpha -= 0.015;
+          fCtx.globalAlpha = Math.max(0, p.alpha);
+          fCtx.fillStyle = p.color;
+          fCtx.beginPath();
+          fCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          fCtx.fill();
+        } else {
+          p.vy += 0.34;
+          p.rot += p.vRot;
+          fCtx.save();
+          fCtx.translate(p.x, p.y);
+          fCtx.rotate((p.rot * Math.PI) / 180);
+          fCtx.fillStyle = p.color;
+          fCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+          fCtx.restore();
+        }
+      });
+      fCtx.globalAlpha = 1;
+      fxParticles = fxParticles.filter((p) => p.alpha > 0 && p.y < fxCanvas.height + 40);
+
+      if (fxParticles.length > 0) {
+        requestAnimationFrame(animateFx);
+      } else {
+        fxAnimating = false;
+        fCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+      }
+    }
+
+    /* ========================================================================
+       4. 9-STAGE NAVIGATION & PROGRESS DOTS
+       ======================================================================== */
+    let currentStage = 1;
+    let fireworkInterval = null;
+
+    function goToStage(num) {
+      currentStage = num;
+      clearInterval(fireworkInterval);
+
+      document.querySelectorAll(".stage-view").forEach((s) => s.classList.remove("active"));
+      const target = document.getElementById(`stage-${num}`);
+      if (target) target.classList.add("active");
+
+      renderStageDots();
+
+      // Stage-specific initialization hooks
+      if (num === 5) initPuzzle();
+      if (num === 6) setTimeout(initScratchCard, 80);
+      if (num === 8) startLetterTypewriter();
+      if (num === 9) {
+        launchBurst("firework", window.innerWidth * 0.3, window.innerHeight * 0.3);
+        setTimeout(() => launchBurst("firework", window.innerWidth * 0.7, window.innerHeight * 0.28), 350);
+        fireworkInterval = setInterval(() => {
+          launchBurst("firework", window.innerWidth * (0.2 + Math.random() * 0.6), window.innerHeight * (0.2 + Math.random() * 0.3));
+        }, 1600);
+      }
+    }
+
+    function renderStageDots() {
+      const container = document.getElementById("stage-dots");
+      container.innerHTML = "";
+      for (let i = 1; i <= 9; i++) {
+        const dot = document.createElement("button");
+        dot.className = `h-2 rounded-full transition-all cursor-pointer ${
+          i === currentStage ? "w-5 bg-pink-400" : i < currentStage ? "w-2 bg-amber-300/80" : "w-2 bg-white/25"
+        }`;
+        dot.title = `Stage ${i}`;
+        dot.addEventListener("click", () => goToStage(i));
+        container.appendChild(dot);
+      }
+      document.getElementById("stage-label-mobile").textContent = `${currentStage} / 9`;
+    }
+
+    document.querySelectorAll(".next-stage-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        playSoftNote(659.25, 180, 0.05, "triangle");
+        goToStage(Number(btn.dataset.next));
+      });
+    });
+
+    /* ========================================================================
+       5. STAGE 1: WELCOME & CONFETTI BURST
+       ======================================================================== */
+    window.addEventListener("load", () => {
+      setTimeout(() => launchBurst("confetti"), 400);
+    });
+
+    document.getElementById("start-journey-btn").addEventListener("click", () => {
+      launchBurst("confetti");
+      if (!melodyPlaying) startBirthdayMelody();
+      goToStage(2);
+    });
+
+    /* ========================================================================
+       6. STAGE 2: LIVE AGE COUNTER
+       ======================================================================== */
+    function updateAgeCounters() {
+      const dob = new Date(appState.dob + "T00:00:00");
+      const now = new Date();
+      const diffMs = Math.max(0, now - dob);
+      const mins = Math.floor(diffMs / 60000);
+      const hrs = Math.floor(mins / 60);
+      const days = Math.floor(hrs / 24);
+      const years = Math.floor(days / 365.2425);
+
+      document.getElementById("age-years").textContent = years.toLocaleString();
+      document.getElementById("age-days").textContent = days.toLocaleString();
+      document.getElementById("age-hours").textContent = hrs.toLocaleString();
+      document.getElementById("age-minutes").textContent = mins.toLocaleString();
+
+      const formattedDate = dob.toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+      });
+      document.getElementById("display-dob").textContent = formattedDate;
+    }
+    setInterval(updateAgeCounters, 10000);
+
+    /* ========================================================================
+       7. STAGE 3: INTERACTIVE CAKE (CLICK/TAP OR MIC BLOW)
+       ======================================================================== */
+    let candlesBlown = false;
+    let micStream = null;
+
+    function blowOutCandles() {
+      if (candlesBlown) return;
+      candlesBlown = true;
+      document.querySelectorAll(".candle-flame").forEach((f) => f.classList.add("blown"));
+      document.querySelectorAll(".smoke-puff").forEach((s) => s.classList.add("rise"));
+      document.getElementById("cake-subtitle").textContent = "Wish made! May all your dreams come true 🌟";
+      document.getElementById("cake-controls").classList.add("hidden");
+      document.getElementById("after-cake-btn").classList.remove("hidden");
+      playChime();
+      launchBurst("confetti");
+
+      if (micStream) {
+        micStream.getTracks().forEach((t) => t.stop());
+        micStream = null;
+      }
+    }
+
+    document.getElementById("blow-btn").addEventListener("click", blowOutCandles);
+    document.getElementById("cake-touch-area").addEventListener("click", blowOutCandles);
+
+    document.getElementById("mic-blow-btn").addEventListener("click", async () => {
+      const btn = document.getElementById("mic-blow-btn");
+      try {
+        micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        btn.textContent = "🌬️ Listening... Blow now!";
+        ensureAudioCtx();
+        const source = audioCtx.createMediaStreamSource(micStream);
+        const analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 256;
+        source.connect(analyser);
+        const data = new Uint8Array(analyser.frequencyBinCount);
+
+        function checkBlow() {
+          if (candlesBlown || !micStream) return;
+          analyser.getByteFrequencyData(data);
+          const avg = data.reduce((a, b) => a + b, 0) / data.length;
+          if (avg > 48) {
+            blowOutCandles();
+            return;
+          }
+          requestAnimationFrame(checkBlow);
+        }
+        checkBlow();
+      } catch (err) {
+        btn.textContent = "Tap Cake to Blow ✨";
+      }
+    });
+
+    /* ========================================================================
+       8. STAGE 4: 3-CARD CUTE MEMORIES CAROUSEL
+       ======================================================================== */
+    let carouselIdx = 0;
+
+    function renderCarousel() {
+      const img = document.getElementById("carousel-photo");
+      const cap = document.getElementById("carousel-caption");
+      const dots = document.getElementById("carousel-indicators");
+
+      img.style.opacity = "0.25";
+      setTimeout(() => {
+        img.src = appState.photos[carouselIdx] || appState.photos[0];
+        cap.textContent = appState.captions[carouselIdx] || appState.captions[0] || "Favorite memories ✨";
+        img.style.opacity = "1";
+      }, 130);
+
+      dots.innerHTML = "";
+      appState.photos.forEach((_, i) => {
+        const b = document.createElement("button");
+        b.className = `h-2 rounded-full transition-all cursor-pointer ${
+          i === carouselIdx ? "w-5 bg-pink-400" : "w-2 bg-white/30"
+        }`;
+        b.addEventListener("click", () => {
+          carouselIdx = i;
+          renderCarousel();
+        });
+        dots.appendChild(b);
+      });
+    }
+
+    document.getElementById("carousel-prev").addEventListener("click", () => {
+      playSoftNote(520, 100);
+      carouselIdx = (carouselIdx - 1 + appState.photos.length) % appState.photos.length;
+      renderCarousel();
+    });
+
+    document.getElementById("carousel-next").addEventListener("click", () => {
+      playSoftNote(580, 100);
+      carouselIdx = (carouselIdx + 1) % appState.photos.length;
+      renderCarousel();
+    });
+
+    /* ========================================================================
+       9. STAGE 5: INTERACTIVE 3x3 SLIDING PHOTO PUZZLE
+       ======================================================================== */
+    let tiles = [];
+    let moves = 0;
+    let solved = false;
+
+    function initPuzzle() {
+      moves = 0;
+      solved = false;
+      document.getElementById("puzzle-moves").textContent = "0";
+      document.getElementById("puzzle-msg").textContent = "";
+      document.getElementById("after-puzzle-btn").classList.add("hidden");
+      document.getElementById("puzzle-preview").src = appState.photos[0];
+
+      tiles = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+      let prevEmpty = -1;
+      for (let i = 0; i < 26; i++) {
+        const empty = tiles.indexOf(8);
+        const neighbors = getNeighbors(empty).filter((n) => n !== prevEmpty);
+        const pick = neighbors[Math.floor(Math.random() * neighbors.length)];
+        [tiles[empty], tiles[pick]] = [tiles[pick], tiles[empty]];
+        prevEmpty = empty;
+      }
+      renderPuzzle();
+    }
+
+    function getNeighbors(idx) {
+      const r = Math.floor(idx / 3);
+      const c = idx % 3;
+      const list = [];
+      if (r > 0) list.push(idx - 3);
+      if (r < 2) list.push(idx + 3);
+      if (c > 0) list.push(idx - 1);
+      if (c < 2) list.push(idx + 1);
+      return list;
+    }
+
+    function renderPuzzle() {
+      const grid = document.getElementById("puzzle-grid");
+      grid.innerHTML = "";
+      const photo = appState.photos[0];
+
+      tiles.forEach((val, pos) => {
+        if (val === 8 && !solved) {
+          const emptyDiv = document.createElement("div");
+          emptyDiv.className = "puzzle-empty";
+          grid.appendChild(emptyDiv);
+        } else {
+          const tile = document.createElement("div");
+          tile.className = "puzzle-tile";
+          const r = Math.floor(val / 3);
+          const c = val % 3;
+          tile.style.backgroundImage = `url("${photo}")`;
+          tile.style.backgroundPosition = `${c * 50}% ${r * 50}%`;
+          tile.addEventListener("click", () => {
+            if (solved) return;
+            const empty = tiles.indexOf(8);
+            if (getNeighbors(empty).includes(pos)) {
+              [tiles[empty], tiles[pos]] = [tiles[pos], tiles[empty]];
+              moves++;
+              document.getElementById("puzzle-moves").textContent = moves;
+              playSoftNote(540, 90);
+              checkPuzzleWin();
+              renderPuzzle();
+            }
+          });
+          grid.appendChild(tile);
+        }
+      });
+    }
+
+    function checkPuzzleWin() {
+      if (tiles.every((v, i) => v === i)) {
+        solved = true;
+        document.getElementById("puzzle-msg").textContent = "🎉 Puzzle Solved! You unlocked the next surprise!";
+        document.getElementById("after-puzzle-btn").classList.remove("hidden");
+        playChime();
+        launchBurst("confetti");
+      }
+    }
+
+    document.getElementById("puzzle-shuffle").addEventListener("click", initPuzzle);
+    document.getElementById("puzzle-solve").addEventListener("click", () => {
+      tiles = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+      checkPuzzleWin();
+      renderPuzzle();
+    });
+
+    /* ========================================================================
+       10. STAGE 6: METALLIC SCRATCH-OFF CARD
+       ======================================================================== */
+    let scratching = false;
+    let scratchDone = false;
+
+    function initScratchCard() {
+      scratchDone = false;
+      document.getElementById("after-scratch-btn").classList.add("hidden");
+      document.getElementById("scratch-photo").src = appState.photos[1] || appState.photos[0];
+
+      const canvas = document.getElementById("scratch-canvas");
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      canvas.style.opacity = "1";
+      canvas.style.pointerEvents = "auto";
+
+      const ctx = canvas.getContext("2d");
+      ctx.globalCompositeOperation = "source-over";
+
+      const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      grad.addColorStop(0, "#831843");
+      grad.addColorStop(0.5, "#db2777");
+      grad.addColorStop(1, "#d97706");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "rgba(255, 255, 255, 0.94)";
+      ctx.font = "bold 20px 'Plus Jakarta Sans', sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("Scratch Here 🌟", canvas.width / 2, canvas.height / 2 - 6);
+      ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+      ctx.font = "13px 'Plus Jakarta Sans', sans-serif";
+      ctx.fillText("Rub with your finger or cursor", canvas.width / 2, canvas.height / 2 + 18);
+
+      function coords(e) {
+        const r = canvas.getBoundingClientRect();
+        const cx = e.touches ? e.touches[0].clientX : e.clientX;
+        const cy = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: cx - r.left, y: cy - r.top };
+      }
+
+      function erase(x, y) {
+        if (scratchDone) return;
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.beginPath();
+        ctx.arc(x, y, 26, 0, Math.PI * 2);
+        ctx.fill();
+
+        const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+        let clear = 0;
+        for (let i = 3; i < pixels.length; i += 32) {
+          if (pixels[i] < 128) clear++;
+        }
+        if (clear / (pixels.length / 32) > 0.42) {
+          scratchDone = true;
+          canvas.style.opacity = "0";
+          canvas.style.pointerEvents = "none";
+          document.getElementById("after-scratch-btn").classList.remove("hidden");
+          playChime();
+          launchBurst("confetti");
+        }
+      }
+
+      canvas.onmousedown = (e) => { scratching = true; const p = coords(e); erase(p.x, p.y); };
+      canvas.onmousemove = (e) => { if (!scratching) return; const p = coords(e); erase(p.x, p.y); };
+      window.onmouseup = () => { scratching = false; };
+
+      canvas.ontouchstart = (e) => { e.preventDefault(); scratching = true; const p = coords(e); erase(p.x, p.y); };
+      canvas.ontouchmove = (e) => { e.preventDefault(); if (!scratching) return; const p = coords(e); erase(p.x, p.y); };
+      canvas.ontouchend = () => { scratching = false; };
+    }
+
+    /* ========================================================================
+       11. STAGE 7: 4-DIGIT SECRET PIN LOCK
+       ======================================================================== */
+    let pinInput = "";
+    const pinDotEls = document.querySelectorAll("#pin-dots span");
+
+    function updatePinDots() {
+      pinDotEls.forEach((dot, i) => {
+        if (i < pinInput.length) {
+          dot.classList.add("bg-pink-400", "border-pink-400", "shadow-[0_0_10px_#ec4899]");
+        } else {
+          dot.classList.remove("bg-pink-400", "border-pink-400", "shadow-[0_0_10px_#ec4899]");
+        }
+      });
+    }
+
+    document.querySelectorAll(".pin-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const val = btn.dataset.num;
+        playSoftNote(580, 90);
+
+        if (val === "del") {
+          pinInput = pinInput.slice(0, -1);
+          updatePinDots();
+          return;
+        }
+
+        if (pinInput.length < 4) {
+          pinInput += val;
+          updatePinDots();
+        }
+
+        if (pinInput.length === 4) {
+          if (pinInput === appState.pin) {
+            document.getElementById("pin-lock-icon").textContent = "🔓";
+            document.getElementById("pin-status-text").textContent = "Unlocked! Opening your letter...";
+            playChime();
+            setTimeout(() => goToStage(8), 600);
+          } else {
+            const card = document.getElementById("pin-card");
+            card.classList.add("shake");
+            playSoftNote(220, 240, 0.05, "sawtooth");
+            setTimeout(() => {
+              card.classList.remove("shake");
+              pinInput = "";
+              updatePinDots();
+            }, 420);
+          }
+        }
+      });
+    });
+
+    /* ========================================================================
+       12. STAGE 8: HANDWRITTEN LETTER TYPEWRITER
+       ======================================================================== */
+    let letterTimer = null;
+
+    function startLetterTypewriter() {
+      clearInterval(letterTimer);
+      const box = document.getElementById("letter-typewriter");
+      const nextBtn = document.getElementById("to-finale-btn");
+      box.textContent = "";
+      nextBtn.classList.add("hidden");
+
+      const text = appState.letter;
+      let i = 0;
+      letterTimer = setInterval(() => {
+        if (i < text.length) {
+          box.textContent += text[i];
+          i++;
+        } else {
+          clearInterval(letterTimer);
+          nextBtn.classList.remove("hidden");
+        }
+      }, 24);
+    }
+
+    /* ========================================================================
+       13. STAGE 9: GRAND FINALE CONTROLS
+       ======================================================================== */
+    document.getElementById("more-fireworks-btn").addEventListener("click", () => {
+      playChime();
+      launchBurst("firework", window.innerWidth * 0.25, window.innerHeight * 0.28);
+      setTimeout(() => launchBurst("firework", window.innerWidth * 0.75, window.innerHeight * 0.26), 220);
+      setTimeout(() => launchBurst("firework", window.innerWidth * 0.5, window.innerHeight * 0.22), 440);
+    });
+
+    document.getElementById("replay-all-btn").addEventListener("click", () => {
+      candlesBlown = false;
+      document.querySelectorAll(".candle-flame").forEach((f) => f.classList.remove("blown"));
+      document.querySelectorAll(".smoke-puff").forEach((s) => s.classList.remove("rise"));
+      document.getElementById("cake-subtitle").textContent = "Tap the candles or use your mic to blow them out ✨";
+      document.getElementById("cake-controls").classList.remove("hidden");
+      document.getElementById("after-cake-btn").classList.add("hidden");
+
+      pinInput = "";
+      updatePinDots();
+      document.getElementById("pin-lock-icon").textContent = "🔐";
+      document.getElementById("pin-status-text").textContent = "Enter the 4-digit PIN to unlock your letter";
+
+      goToStage(1);
+      setTimeout(() => launchBurst("confetti"), 300);
+    });
+
+    /* ========================================================================
+       14. UPLOAD PHOTO & CUSTOMIZE MODAL + SINGLE-FILE HTML EXPORT
+       ======================================================================== */
+    const modal = document.getElementById("customize-modal");
+
+    function openCustomize() {
+      document.getElementById("cfg-name").value = appState.name;
+      document.getElementById("cfg-dob").value = appState.dob;
+      document.getElementById("cfg-pin").value = appState.pin;
+      document.getElementById("cfg-captions").value = appState.captions.join("\n");
+      document.getElementById("cfg-letter").value = appState.letter;
+      document.getElementById("modal-feedback").textContent = "";
+
+      appState.photos.forEach((src, i) => {
+        document.getElementById(`slot-preview-${i}`).src = src;
+      });
+
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    }
+
+    function closeCustomize() {
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
+
+    document.getElementById("open-customize-btn").addEventListener("click", openCustomize);
+    document.getElementById("close-customize-btn").addEventListener("click", closeCustomize);
+
+    // Process uploaded photos into base64 data URLs
+    document.querySelectorAll(".photo-upload-input").forEach((input) => {
+      input.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        const slot = Number(e.target.dataset.slot);
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = () => {
+            const maxDim = 800;
+            let w = img.width;
+            let h = img.height;
+            if (w > maxDim || h > maxDim) {
+              if (w > h) {
+                h = Math.round((h * maxDim) / w);
+                w = maxDim;
+              } else {
+                w = Math.round((w * maxDim) / h);
+                h = maxDim;
+              }
+            }
+            const c = document.createElement("canvas");
+            c.width = w;
+            c.height = h;
+            c.getContext("2d").drawImage(img, 0, 0, w, h);
+            const base64Url = c.toDataURL("image/jpeg", 0.88);
+
+            appState.photos[slot] = base64Url;
+            document.getElementById(`slot-preview-${slot}`).src = base64Url;
+            document.getElementById("modal-feedback").textContent = `Photo #${slot + 1} ready! Click "Save & Preview Live" ✨`;
+          };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+
+    function syncAllViews() {
+      document.title = `Happy Birthday ${appState.name} ✨`;
+      document.getElementById("hero-name").textContent = appState.name;
+      document.getElementById("letter-to-name").textContent = appState.name;
+      document.getElementById("finale-name").textContent = appState.name;
+      document.getElementById("pin-hint-label").textContent = `Hint: PIN ${appState.pin}`;
+
+      document.getElementById("hero-avatar").src = appState.photos[0];
+      document.getElementById("puzzle-preview").src = appState.photos[0];
+      document.getElementById("scratch-photo").src = appState.photos[1] || appState.photos[0];
+      document.getElementById("finale-img-0").src = appState.photos[0];
+      document.getElementById("finale-img-1").src = appState.photos[1] || appState.photos[0];
+      document.getElementById("finale-img-2").src = appState.photos[2] || appState.photos[0];
+
+      updateAgeCounters();
+      renderCarousel();
+      renderStageDots();
+    }
+
+    document.getElementById("apply-cfg-btn").addEventListener("click", () => {
+      const name = document.getElementById("cfg-name").value.trim();
+      const dob = document.getElementById("cfg-dob").value;
+      const pin = document.getElementById("cfg-pin").value.replace(/\D/g, "").slice(0, 4);
+      const captionsRaw = document.getElementById("cfg-captions").value
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean);
+      const letter = document.getElementById("cfg-letter").value.trim();
+
+      if (name) appState.name = name;
+      if (dob) appState.dob = dob;
+      if (pin.length === 4) appState.pin = pin;
+      if (captionsRaw.length > 0) appState.captions = captionsRaw;
+      if (letter) appState.letter = letter;
+
+      syncAllViews();
+      if (currentStage === 5) renderPuzzle();
+      if (currentStage === 8) startLetterTypewriter();
+
+      playChime();
+      document.getElementById("modal-feedback").textContent = "Saved & applied across all 9 stages! 🎉";
+      setTimeout(closeCustomize, 600);
+    });
+
+    // Export complete self-contained single-file index.html with base64 photos embedded
+    document.getElementById("download-html-btn").addEventListener("click", () => {
+      document.getElementById("apply-cfg-btn").click();
+      const clone = document.documentElement.cloneNode(true);
+
+      // Reset exported clone to Stage 1 & closed modal
+      clone.querySelectorAll(".stage-view").forEach((s) => s.classList.remove("active"));
+      const s1 = clone.querySelector("#stage-1");
+      if (s1) s1.classList.add("active");
+
+      const clonedModal = clone.querySelector("#customize-modal");
+      if (clonedModal) {
+        clonedModal.classList.add("hidden");
+        clonedModal.classList.remove("flex");
+      }
+
+      const stateTag = clone.querySelector("#embedded-state");
+      if (stateTag) {
+        stateTag.textContent = JSON.stringify(appState);
+      }
+
+      const htmlString = "<!DOCTYPE html>\n" + clone.outerHTML;
+      const blob = new Blob([htmlString], { type: "text/html;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "index.html";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    });
+
+    // Initialize UI on boot
+    syncAllViews();
+  </script>
+</body>
+</html>
